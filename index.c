@@ -1,3 +1,4 @@
+//cc index.c  libraylib.a -framework IOKit -framework Cocoa && ./a.out
 #include<raylib.h>
 #include<stdio.h>
 #include<stdlib.h>
