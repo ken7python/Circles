@@ -50,8 +50,15 @@ void circle_mouse(circle* c){
     int mouseX = GetMouseX();
     int mouseY = GetMouseY();
 
-    c->x += (mouseX - c->x) * 0.1;
-    c->y += (mouseY - c->y) * 0.1;
+    if (IsGamepadAvailable(0) ){
+        float speed_x = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * 30;
+        float speed_y = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) * 30;
+        c->x += speed_x;
+        c->y += speed_y;
+    }else{
+        c->x += (mouseX - c->x) * 0.1;
+        c->y += (mouseY - c->y) * 0.1;
+    }
 }
 
 bool circle_col(circle* c1, circle* c2){
@@ -120,23 +127,88 @@ void init_enemies() {
     }
 }
 
-void circle_powerup(circle* c, circle* p){
-    c->radius += p->radius / 4;
+void enemy_revival(circle* this,circle* player){
+    int p = GetRandomValue(0, 3);
+    int x,y;
+    int xv = 0;
+    int yv = 0;
+
+    if(p == 0){
+        x = GetRandomValue(0, screenWidth);
+        y = GetRandomValue(0, 1) * screenHeight;
+    }else
+    if (p == 1){
+        x = GetRandomValue(0, 1) * screenWidth;
+        y = GetRandomValue(0, screenHeight);
+    }else
+    if (p == 2){
+        x = GetRandomValue(0, screenWidth);
+        y = 0;
+    }else
+    if (p == 3){
+        x = screenWidth;
+        y = GetRandomValue(0, screenHeight);
+    }
+
+    while (xv == 0 && yv == 0){
+        xv = GetRandomValue(-5, 5);
+        yv = GetRandomValue(-5, 5);
+    }
+    int r;
+    int p_radius = player->radius;
+    
+    int big_or_small = GetRandomValue(0,10);
+    if (big_or_small > 5){
+        r = p_radius + 5;
+    }else{
+        r = GetRandomValue(10,p_radius / 2);
+    }
+
+    if (r > 50){
+        r = 50;
+    }
+    
+    //r = GetRandomValue(10,p_radius);
+    printf("enemy x: %d y: %d xv: %d yv: %d radius: %d\n", x, y, xv, yv, r);
+    this->x = x;
+    this->y = y;
+    this->xv = xv;
+    this->yv = yv;
+    this->radius = r;
+    this->color = colors[GetRandomValue(0, 4)];
 }
 
-void circle_disappear(circle* c){
+void circle_powerup(circle* c, circle* p){
+    int powerup = p->radius / 4;
+
+    if (c->radius < 50){
+        c->radius += powerup;
+    }
+}
+
+void circle_powerdown(circle* c){
+    c->radius = c->radius - c->radius / 4;
+}
+
+void circle_disappear(circle* c,circle* p){
+    /*
     c->x = -100;
     c->y = -100;
     c->xv = 0;
     c->yv = 0;
+    */
+    enemy_revival(c,p);
 }
 
 int main(){
+    int playcount = 0;
     bool start = false;
     bool gameclear = false;
 
     int heratime = 0;
     int cleartime = 0;
+    
+    int playtime = 0;
 
     InitWindow(screenWidth, screenHeight, "Circle Game");
     srand(time(NULL));
@@ -145,23 +217,42 @@ int main(){
     init_enemies();
     
     SetTargetFPS(60);
+    int powerdonwn_time = 0;
 
     while (!WindowShouldClose()){
         if (start){
             circle_mouse(&player);
         }
-        if (!start && IsKeyPressed(KEY_SPACE)){
+        if (!start && (IsKeyPressed(KEY_SPACE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))){
             init_enemies();
             start = true;
+            playcount++;
             heratime = GetTime();
         }
-        if (gameclear && IsKeyPressed(KEY_SPACE)){
+        if (gameclear && (IsKeyPressed(KEY_SPACE) || IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN))){
             gameclear = false;
             player_init();
             init_enemies();
             start = true;
+            playcount++;
             heratime = GetTime();
         }
+
+        if (start){
+            playtime = GetTime() - heratime;
+        }
+        //printf("time: %d\n",playtime);
+        
+        if(start && (playtime + 1) % 5 == 0 && playtime != powerdonwn_time){
+            powerdonwn_time = playtime;
+            printf("powerdown\n");
+            circle_powerdown(&player);
+            if(player.radius <= 0){
+                start = false;
+                player_init();
+            }
+        }
+
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
@@ -183,8 +274,9 @@ int main(){
                         if (player.radius < enemies[i].radius){
                             start = false;
                             player_init();
+                            printf("gameover\n");
                         }else{
-                            circle_disappear(&enemies[i]);
+                            circle_disappear(&enemies[i],&player);
                             circle_powerup(&player, &enemies[i]);
                         }
                     }
@@ -200,6 +292,9 @@ int main(){
                 }
             }else{
                 DrawText("Press SPACE to start", screenWidth / 2 - MeasureText("Press SPACE to start", 50) / 2, screenHeight / 2, 50, BLACK);
+                if (playcount > 0){
+                    DrawText(TextFormat("Time: %d seconds", playtime), 250, 350, 50, GREEN);
+                }
             }
         EndDrawing();
     }
