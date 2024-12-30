@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>Circles</string> <!-- 実行ファイル名 -->
+    <key>CFBundleIdentifier</key>
+    <string>com.example.circles</string> <!-- 適切な識別子 -->
+    <key>CFBundleName</key>
+    <string>Circles</string> <!-- アプリ名 -->
+    <key>CFBundleVersion</key>
+    <string>1.0</string> <!-- バージョン番号 -->
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>

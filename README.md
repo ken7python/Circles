@@ -22,12 +22,18 @@ Circle Gameは、プレイヤーが円を操作して敵の円を避けながら
 ```bash
 cc index.c -lraylib -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL
 ```
-
 ### 方法 2
 ```bash
 cc index.c libraylib.a -framework IOKit -framework Cocoa && ./a.out
 ```
 
+## ビルド方法
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
 
 
 ## ゲームの開始

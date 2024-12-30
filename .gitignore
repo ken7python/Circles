@@ -2,3 +2,9 @@
 
 libraylib.a
 raylib.h
+
+*.app
+build/
+CMakeFiles/
+cmake_install.cmake
+Makefile
