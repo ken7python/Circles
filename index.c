@@ -47,17 +47,17 @@ void circle_move(circle* c){
 
 }
 void circle_mouse(circle* c){
-    int mouseX = GetMouseX();
-    int mouseY = GetMouseY();
-
     if (IsGamepadAvailable(0) ){
-        float speed_x = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X) * 30;
-        float speed_y = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y) * 30;
-        c->x += speed_x;
-        c->y += speed_y;
+        float axisX = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
+        float axisY = GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+        float threshold = 0.1; // 閾値を設定
+        if (fabs(axisX) > threshold || fabs(axisY) > threshold) {
+            c->x += axisX * 15;
+            c->y += axisY * 15;
+        }
     }else{
-        c->x += (mouseX - c->x) * 0.1;
-        c->y += (mouseY - c->y) * 0.1;
+        c->x += (GetMouseX() - c->x) * 0.1;
+        c->y += (GetMouseY() - c->y) * 0.1;
     }
 }
 
@@ -100,7 +100,7 @@ void init_enemies() {
         int x,y;
         int xv = 0;
         int yv = 0;
-
+        
         if(p == 0){
             x = GetRandomValue(0, screenWidth);
             y = GetRandomValue(0, 1) * screenHeight;
@@ -122,7 +122,7 @@ void init_enemies() {
             xv = GetRandomValue(-5, 5);
             yv = GetRandomValue(-5, 5);
         }
-        int r = GetRandomValue(3, 30);
+        //int r = GetRandomValue(3, 30);
         circle_init(&enemies[i], x, y, xv,yv, rs[i], colors[GetRandomValue(0, 4)]);
     }
 }
