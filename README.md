@@ -15,10 +15,19 @@ Circle Gameは、プレイヤーが円を操作して敵の円を避けながら
 ## 必要な依存関係
 このプロジェクトをビルドするには、[Raylib](https://www.raylib.com/)が必要です。
 
-## 実行方法
+## 実行方法 (Mac)
+以下のコマンドを使用して、プログラムをコンパイルおよび実行できます。
+
+### 方法 1
 ```bash
-    cc index.c  libraylib.a -framework IOKit -framework Cocoa && ./a.out
+cc index.c -lraylib -framework CoreVideo -framework IOKit -framework Cocoa -framework GLUT -framework OpenGL
 ```
+
+### 方法 2
+```bash
+cc index.c libraylib.a -framework IOKit -framework Cocoa && ./a.out
+```
+
 
 
 ## ゲームの開始
